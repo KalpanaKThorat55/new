@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Dashboard</title>
+    <style>
+        body {
+            display: flex;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .sidebar {
+            height: 100vh;
+            width: 200px;
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+
+            .sidebar a {
+                display: block;
+                margin-bottom: 10px;
+                text-decoration: none;
+                color: #333;
+            }
+
+        .content {
+            flex: 1;
+            padding: 20px;
+        }
+
+            .content h2 {
+                margin-bottom: 20px;
+            }
+
+
+        .form label {
+            display: inline-block;
+            width: 150px;
+        }
+
+
+        input:invalid {
+            border: 2px solid red;
+        }
+
+
+        .error-message {
+            color: red;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <a href="#" onclick="showDashboard()">Dashboard</a>
+        <a href="#" onclick="showAddCompany()">Add a Company</a>
+        <a href="#" onclick="showListOfStudents()">List of Students</a>
+    </div>
+    <div class="content">
+        <h2>Welcome to College Management System</h2>
+        <div id="dashboardContent">
+            <p>Companies which are present:</p>
+        </div>
+        <div id="addCompanyContent" style="display: none;">
+            <h1>Company Details</h1>
+
+            <section class="form">
+                <form action="college_dashboard.html" onsubmit="return validateForm()">
+                    <!-- ... Your existing HTML code ... -->
+
+<label for="company_id">Company ID:</label>
+<input type="text" id="company_id" name="company_id" required pattern="C\d+" title="Company ID must start with 'C' followed by at least one digit" placeholder="Enter Company ID (e.g., C101)">
+<span class="error-message" id="companyIdError"></span><br><br>
+
+<label for="company_name">Company Name:</label>
+<input type="text" id="company_name" name="company_name" required pattern="[^0-9]+" title="Company Name must not contain digits" placeholder="Enter Company Name">
+<span class="error-message" id="companyNameError"></span><br><br>
+
+<label for="company_criteria">Company Criteria:</label>
+<input type="text" id="company_criteria" name="company_criteria" required placeholder="Enter Company Criteria">
+<span class="error-message" id="companyCriteriaError"></span><br><br>
+
+<label for="package_range">Package Range:</label>
+<input type="text" id="package_range" name="package_range" required pattern="\d+-\d+" title="Invalid package range format. Please use Min-Max format (e.g., 50000-75000)" placeholder="Enter Range (e.g., 50000-75000)">
+<span class="error-message" id="packageRangeError"></span><br><br>
+
+<label for="frschedule">First Round Schedule:</label>
+<input type="datetime-local" id="frschedule" name="frschedule" required placeholder="Select First Round Schedule">
+<span class="error-message" id="frScheduleError"></span><br><br>
+
+<input type="submit" value="Add">
+
+                </form>
+            </section>
+        </div>
+        <div id="listOfStudentsContent" style="display: none;">
+            <p>List of Students</p>
+        </div>
+    </div>
+
+    <script>
+        function showDashboard() {
+            document.getElementById("dashboardContent").style.display = "block";
+            document.getElementById("addCompanyContent").style.display = "none";
+            document.getElementById("listOfStudentsContent").style.display = "none";
+        }
+
+        function showAddCompany() {
+            document.getElementById("dashboardContent").style.display = "none";
+            document.getElementById("addCompanyContent").style.display = "block";
+            document.getElementById("listOfStudentsContent").style.display = "none";
+        }
+
+        function showListOfStudents() {
+            document.getElementById("dashboardContent").style.display = "none";
+            document.getElementById("addCompanyContent").style.display = "none";
+            document.getElementById("listOfStudentsContent").style.display = "block";
+        }
+
+        function validateForm() {
+            var companyId = document.getElementById("company_id").value;
+            var companyName = document.getElementById("company_name").value;
+            var companyCriteria = document.getElementById("company_criteria").value;
+            var packageRange = document.getElementById("package_range").value;
+            var frSchedule = document.getElementById("frschedule").value;
+
+            /*if (!isValidPackageRange(packageRange)) {
+                document.getElementById("packageRangeError").textContent = "Invalid package range format. Please use Min-Max format (e.g., 50000-75000).";
+                return false;
+            } else {
+                document.getElementById("packageRangeError").textContent = "";
+            }*/
+
+            var pattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+
+            if (!pattern.test(frSchedule)) {
+                document.getElementById("frScheduleError").textContent = "Invalid date and time format. Please use YYYY-MM-DDTHH:MM format.";
+                return false;
+            } else {
+                document.getElementById("frScheduleError").textContent = "";
+            }
+
+            if (/\d/.test(companyName)) {
+                document.getElementById("companyNameError").textContent = "Company Name must not contain digits.";
+                return false;
+            } else {
+                document.getElementById("companyNameError").textContent = "";
+            }
+
+            if (!/^C\d+$/.test(companyId)) {
+                document.getElementById("companyIdError").textContent = "Company ID must start with 'C' followed by at least one digit.";
+                return false;
+            } else {
+                document.getElementById("companyIdError").textContent = "";
+            }
+
+            if (!/^\d+-\d+$/.test(packageRange)) {
+                document.getElementById("packageRangeError").textContent = "Invalid package range format. Please use Min-Max format (e.g., 50000-75000).";
+                return false;
+            } else {
+                var rangeParts = packageRange.split('-');
+                if (parseInt(rangeParts[0]) >= parseInt(rangeParts[1])) {
+                    document.getElementById("packageRangeError").textContent = "Package range should have the smaller number first.";
+                    return false;
+                } else {
+                    document.getElementById("packageRangeError").textContent = "";
+                }
+            }
+
+
+            if (companyCriteria === "") {
+                document.getElementById("companyCriteriaError").textContent = "Company Criteria is required.";
+            } else {
+                document.getElementById("companyCriteriaError").textContent = "";
+            }
+
+            if (companyName === "" || companyCriteria === "" || packageRange === "" || frSchedule === "") {
+                return false;
+            }
+
+            return true;
+        }
+
+        function isValidPackageRange(range) {
+            var pattern = /^\d+-\d+$/;
+            return pattern.test(range);
+        }
+    </script>
+</body>
+</html>
